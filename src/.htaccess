@@ -1,0 +1,34 @@
+<IfModule mod_autoindex.c>
+# Prevent directory browsing 
+    Options -Indexes
+</IfModule>
+
+<IfModule mod_rewrite.c>
+# Apache Rewrite Rules
+	# Options 
+		Options +FollowSymLinks +MultiViews
+	
+	# Turn mod_rewrite on
+		RewriteEngine On
+	
+	# Hide www 
+	RewriteCond %{HTTPS} !=on
+	RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+	RewriteRule ^(.*)$ http://%1%{REQUEST_URI} [R=301,L]
+	
+	# Force HTTPS 
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R=301,L]
+	
+	# To externally redirect /dir/foo.php to /dir/foo
+    RewriteCond %{REQUEST_METHOD} !POST
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+    RewriteRule ^ %1 [R,L]
+	
+	# To internally forward /dir/foo to /dir/foo.php, /dir/foo/ to /dir/foo/
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME}\.php -f
+	RewriteRule ^(.*)$ $1.php
+ 
+# End of Apache Rewrite Rules
+</IfModule>
