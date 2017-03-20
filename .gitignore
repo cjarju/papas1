@@ -11,6 +11,6 @@
 /node_modules
 
 # Ignore dist directory
-/dist_b
+/dist
 
 
