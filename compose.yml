@@ -1,0 +1,36 @@
+services:
+  php-apache:
+    build: .
+    container_name: php-apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./dist:/var/www/html
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  node:
+    image: node:14
+    container_name: node
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: sh -c "npm install && npx gulp build"
+    env_file:
+      - .env
+
+volumes:
+  mysql_data:
