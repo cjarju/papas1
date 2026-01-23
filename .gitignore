@@ -4,13 +4,17 @@
 # or operating system, you probably want to add a global ignore instead:
 #   git config --global core.excludesfile '~/.gitignore_global'
 
-# ignore JetBrains IDE files 
-/.idea
+# IDE files 
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-# Ignore node_modules directory (Nodejs)
-/node_modules
+# Ignore node_modules directory (Nodejs: gulp)
+node_modules
 
 # Ignore dist directory
-/dist
+dist
 
-
+# Ignore environment variable files
+.env
