@@ -3,10 +3,10 @@
 /* prevent display of error messages in browser: production mode */
 /*ini_set('display_errors', '0');*/
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "webapp01";
+$servername = $_ENV['MYSQL_SERVERNAME'];
+$username   = $_ENV['MYSQL_USER'];
+$password   = $_ENV['MYSQL_PASSWORD'];
+$database   = $_ENV['MYSQL_DATABASE'];
 
 /* Create connection */
 
