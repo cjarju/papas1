@@ -1,11 +1,7 @@
 // styles.scss
-.testing {
-  width: percentage(5/7);
-  color: #ff00430;
-}
+@use "sass:math";
 
-/*
-.show-hide-contact-bar {
+.testing {
+  width: math.percentage(math.div(5, 7));
   color: #ff0000;
 }
-*/
