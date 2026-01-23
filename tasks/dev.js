@@ -1,64 +1,85 @@
-﻿var bs = {
-        root: 'papas1/',
-        src:  'src/',
-        dist: 'dist/'
-    }
-    , asts = {
-        scss_dir:       'assets/scss/',     scss_files:     'assets/scss/*.scss',
-        css_dir:        'assets/css/',      css_files:      'assets/css/*.css',
-        js_dir:         'assets/js/',       js_files:       'assets/js/*.js',
-        img_dir:        'assets/images/',   img_files:      'assets/images/**/*.@(jpeg|jpg|gif|png)',
-        fonts_dir:      'assets/fonts/',    fonts_files:    'assets/fonts/*',
-        data_dir:       'assets/data/',     data_files:     'assets/data/*'
-    }
-    , admin = {
-        scss_dir:       'admin/assets/scss/',   scss_files:     'admin/assets/scss/*.scss',
-        css_dir:        'admin/assets/css/',    css_files:      'admin/assets/css/*.css',
-        js_dir:         'admin/assets/js/',     js_files:       'admin/assets/js/*.js',
-        img_dir:        'admin/assets/images/', img_files:      'admin/assets/images/**/*.@(jpeg|jpg|gif|png)',
-        fonts_dir:      'admin/assets/fonts/',  fonts_files:    'admin/assets/fonts/*',
-        data_dir:       'admin/assets/data/',   data_files:     'admin/assets/data/*',
-        incl_dir:       'admin/includes/'
-    }
-    , feui_srv_url = 'https://localhost/'+bs.root+bs.dist
-    , beui_srv_url = 'https://localhost/'+bs.root+bs.dist+'admin/'
-    , tmp_dir      = 'tmp/'
-    ;
+﻿/*
+ * Watch files with BrowserSync in dev mode
+*/
 
-/* dev tasks */
+const gulp = require('gulp');
+const browserSync = require('browser-sync').create();
+const cached = require('gulp-cached');
+const sass = require('gulp-sass')(require('sass'));
+const log = require('fancy-log');
+const chalk = require('chalk');
+const path = require('path');
 
-/* initialize browser obj */
-gulp.task('browserSync', function() {
-    return browserSync.init({
-        proxy: "https://localhost/devajax/src/"
-    })
-});
+// -------------------------
+// Paths
+// -------------------------
+const APP_INTERNAL_URL = process.env.APP_INTERNAL_URL;
 
-/* reload browser */
-gulp.task('browserReload', function() {
-    return browserSync.reload();
-});
+const bs = {
+  src: path.resolve(__dirname, '../src/') + '/',
+  dist: path.resolve(__dirname, '../dist/') + '/'
+};
 
-/* compile scss --> css */
-gulp.task('sass', function() {
-    return gulp.src(bs.src+asts.scss_files) // Return all files ending with .scss in src/assets/scss and children dirs
-        .pipe(gcached('assetscss', {optimizeMemory: true})).on('error', gutil.log) // Return files that have changed only
-        .pipe(gsass()).on('error', gutil.log) // Compile and return CSS files
-        .pipe(gulp.dest(bs.src+asts.css_dir)) // Write CSS files
-    //.pipe(browserSync.stream()) // Inject changes into browser without reload. redundant as there's a watcher for css dir
-});
+const asts = {
+  scss_dir: 'assets/scss/', scss_files: 'assets/scss/*.scss',
+  css_dir: 'assets/css/', css_files: 'assets/css/*.css',
+  js_dir: 'assets/js/', js_files: 'assets/js/*.js'
+};
 
-gulp.task('devbuild', ['browserSync', 'sass'], function (){
+// -------------------------
+// Browser Sync
+// -------------------------
+function browserSyncInit(done) {
+  browserSync.init({
+    proxy: APP_INTERNAL_URL, // local dev server URL
+    port: 3000,              // BrowserSync serves here
+    open: false,             // set to false in headless/Docker
+    notify: false
+  });
+  done();
+}
 
-    gulp.watch(bs.src+asts.scss_files, ['sass']);
+// -------------------------
+// SCSS compilation
+// -------------------------
+function compileSass() {
+  return gulp.src(bs.src + asts.scss_files)
+    .pipe(cached('assetscss', { optimizeMemory: true }))
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest(bs.src + asts.css_dir))
+    .pipe(browserSync.stream()); // inject CSS changes without full reload
+}
 
-    gulp.watch([bs.src+asts.css_files, bs.src+asts.js_files], function(event) {
-        gutil.log('File: ' + gutil.colors.green(path.basename(event.path)) + ' was ' + event.type + '.');
-        browserSync.reload();
+// -------------------------
+// Watchers
+// -------------------------
+function watchFiles() {
+  // SCSS files
+  gulp.watch(bs.src + asts.scss_files, compileSass);
+
+  // CSS / JS / PHP files - reload browser on changes
+  gulp.watch([bs.src + asts.css_files, bs.src + asts.js_files, bs.src + 'index.php'])
+    .on('change', (file) => {
+      log(`${chalk.green(path.basename(file))} was changed.`);
+      browserSync.reload(); // call reload directly, no need for 'done'
     });
+}
 
-    gulp.watch(bs.src+'index.php').on('change', function(file) {
-        gutil.log('File: ' + gutil.colors.green(path.basename(file.path)) + ' was changed.');
-        browserSync.reload();
-    });
-});
+// -------------------------
+// Dev Build Task
+// -------------------------
+const watchchanges = gulp.series(
+  browserSyncInit,
+  compileSass,
+  watchFiles
+);
+
+// -------------------------
+// Exports
+// -------------------------
+module.exports = {
+  compileSass,
+  browserSyncInit,
+  watchFiles,
+  watchchanges
+};
