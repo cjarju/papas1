@@ -1,5 +1,24 @@
-# About Project
+# Papasmedia
+Single-page PHP site version for Papasmedia.
 
+## Demo
+
+### User page
+<p align="center">
+  <img src="docs/teaser/user-ui.gif" width="640"/>
+</p>
+
+### Admin | About page
+<p align="center">
+  <img src="docs/teaser/about-edit.png" width="640"/>
+</p>
+
+### Admin | Services page
+<p align="center">
+  <img src="docs/teaser/services-mgr.png" width="640"/>
+</p>
+
+## About Project
 Single-page PHP site for Papasmedia with a front-end asset pipeline powered by Gulp. The public content lives on one scrolling page rendered from [src/index.php](src/index.php), and is backed by Apache (PHP 8.1) and MySQL. Development uses BrowserSync proxying the internal container URL for live reload of SCSS and assets.
 
 Key traits:
@@ -8,21 +27,20 @@ Key traits:
 - Asset pipeline: SCSS → CSS, image optimization, and copying app files to [dist](dist) for production.
 - Live reload dev workflow via BrowserSync (`gulp watch`) proxying the internal Apache container URL.
 
-## System Dependencies
+**Note**: The multi-page version of the site can be found [here](https://github.com/cjarju/papas2).
 
+## System Dependencies
 - Docker + Docker Compose (recommended)
 - PHP 8.1 with Apache (containerized)
 - MySQL 8.0 (containerized)
 - Node.js 14.x for Gulp tasks
 
-Optional local-only development requires PHP and MySQL installed locally; Docker is preferred.
+Optional local-only development requires PHP and MySQL installed locally; Docker is recommended.
 
 ## Getting Started
-
 This section contains the steps necessary to get the application up and running.
 
 ### Prerequisites
-
 1. Clone the repository:
 
    ```bash
@@ -40,8 +58,7 @@ This section contains the steps necessary to get the application up and running.
    - `ENV_DIR=src` for development or `ENV_DIR=dist` for production
    - MySQL credentials (match defaults in example if unsure)
 
-### Containerized Setup (recommended)
-
+### Containerized Setup
 1. Build images:
 
    ```bash
@@ -105,17 +122,16 @@ This section contains the steps necessary to get the application up and running.
    ```
 
 #### Useful Docker Compose commands
-
 ```bash
 docker compose up            # (re)create the services
 docker compose stop          # stop the services
 docker compose start         # start the services
 docker compose restart       # restart the services
 docker compose down          # teardown the services
+docker compose run           # run a one-time command against a service
 ```
 
 ## Project Structure
-
 - [src](src): PHP pages, assets, includes, and admin.
 - [dist](dist): Built production files (output of Gulp build).
 - [tasks](tasks): Build helper scripts.
@@ -123,18 +139,18 @@ docker compose down          # teardown the services
 - [compose.yml](compose.yml): Docker Compose services (php-apache, mysql, node).
 - [Dockerfile](Dockerfile): Apache + PHP 8.1 container.
 
-## Teaser
+## Future Work
 
-<div style="margin-left: 50px">
+Planned improvements and extensions for upcoming versions of the project:
 
-![Home](docs/teaser/user-ui.gif)
+### Codebase Refactoring
+- Use Laravel to make the codebase more maintainable.
 
-![About](docs/teaser/about-edit.png)
+### Architecture
+- Implement backend as a REST API
+- Use a frontend framework (Vue.js or React) for the UI
 
-![Services](docs/teaser/services-mgr.png)
-
-</div>
+This would allow having different UIs powered by the same backend.
 
 ## License
-
 The project is licensed under the MIT License. Refer to [LICENSE](LICENSE) for more information.
